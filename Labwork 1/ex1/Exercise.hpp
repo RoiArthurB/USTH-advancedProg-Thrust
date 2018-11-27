@@ -93,6 +93,15 @@ public:
     }
   }
 
+  //function that adds three elements and returns a new one
+  typedef thrust::tuple<float, float, float>myFloat3;
+  class AdditionFunctor3 : public thrust::unary_function<myFloat3, float> {
+    public :
+      __device__ float operator()( const myFloat3& tuple ) {
+        return thrust::get<0>(tuple) + thrust::get<1>(tuple) + thrust::get<2>(tuple) ;
+      }
+  };
+
   // students have to implement the following in "Exercise.cpp":
   void Question1(const thrust::host_vector<int>& A,
                 const thrust::host_vector<int>& B, 
