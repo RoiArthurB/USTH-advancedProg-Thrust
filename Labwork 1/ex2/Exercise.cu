@@ -58,11 +58,56 @@ void Exercise::Question1(const thrust::host_vector<int>& A, thrust::host_vector<
 }
 
 
+class EvenOddFunctor2 : public thrust::unary_function<const long long, long long> {
+	const long long m_half_size;
+public:
+	__host__ __device__ EvenOddFunctor2() = delete;
+	__host__ __device__ EvenOddFunctor2(const long long size) : m_half_size(size/2) {}
+	EvenOddFunctor2(const EvenOddFunctor2&) = default;
+	__host__ __device__ long long operator()(const long long &idx) {
+		const long long oe = idx&0x1;
+		const long long idx2 = idx >> 1;
+		return idx2 + oe * m_half_size;
+	}
+};
+void Exercise::Question2(const thrust::host_vector<int>&A, thrust::host_vector<int>&OE) const {
+	// TODO: idem q1 using SCATTER
+	ChronoGPU chrUP, chrDOWN, chrGPU;
 
-void Exercise::Question2(const thrust::host_vector<int>&A, 
-						thrust::host_vector<int>&OE) const 
-{
-  // TODO: idem q1 using SCATTER
+	chrUP.start();
+	thrust::device_vector<int> d_A(A);
+	thrust::device_vector<int> d_OE(A.size());
+	chrUP.stop();
+
+	const long long size = static_cast<const long long>(A.size());
+	for (int i=3; i--;) 
+	{
+		chrUP.start();
+		thrust::device_vector<int> d_A(A);
+		thrust::device_vector<int> d_OE(size);
+		chrUP.stop();
+
+		chrGPU.start();
+
+		thrust::scatter(
+			d_A.begin(), d_A.end(),
+			thrust::make_transform_iterator( 
+				thrust::make_counting_iterator(static_cast<long long>(0)), 
+				EvenOddFunctor2(size)),
+			d_OE.begin()
+		);
+		chrGPU.stop();
+
+		chrDOWN.start();
+		OE = d_OE;
+		chrDOWN.stop();
+	}
+
+	float elapsed = chrUP.elapsedTime() + chrDOWN.elapsedTime() + chrGPU.elapsedTime();
+	std::cout <<"Question 2 done in " << elapsed << "ms" << std::endl;
+	std::cout <<" - UP time 	:" << chrUP.elapsedTime() << "ms" << std::endl;
+	std::cout <<" - GPU time 	:" << chrGPU.elapsedTime() << "ms" << std::endl;
+	std::cout <<" - DOWN time 	:" << chrDOWN.elapsedTime() << "ms" << std::endl;
 }
 
 
