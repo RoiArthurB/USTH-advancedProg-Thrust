@@ -37,13 +37,12 @@ void Exercise::Question1(const thrust::host_vector<int>& A, thrust::host_vector<
 
 		chrGPU.start();
 		EvenOddFunctor1 oef(size);
-		
-		auto begin = thrust::make_transform_iterator(
-			thrust::make_counting_iterator(static_cast<long long>(0)), oef);
-		auto end = thrust::make_transform_iterator(
-			thrust::make_counting_iterator(size), oef);
 
-		thrust::gather(	begin, end, d_A.begin(), d_OE.begin());
+		thrust::gather(
+			thrust::make_transform_iterator( thrust::make_counting_iterator(static_cast<long long>(0)), oef), 
+			thrust::make_transform_iterator(thrust::make_counting_iterator(size), oef), 
+			d_A.begin(), d_OE.begin()
+		);
 		chrGPU.stop();
 
 		chrDOWN.start();
