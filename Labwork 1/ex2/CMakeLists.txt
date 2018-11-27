@@ -1,32 +1,22 @@
-cmake_minimum_required(VERSION 3.12.3)
-set(EXECUTABLE_NAME Exercise1)
-set(PROJECT_NAME Exercise1)
+cmake_minimum_required(VERSION 3.0)
+set(EXECUTABLE_NAME Exercise2)
+set(PROJECT_NAME Exercise2)
 
-# set CUDA
-set(CUDA_STANDARD 14)
-set(CUDA_STANDARD_REQUIRED ON)
-set(CUDA_64_BIT_DEVICE_CODE ON)
-set(CUDA_VERBOSE_BUILD  ON)
-project(${EXECUTABLE_NAME} LANGUAGES CXX CUDA)
+project(${EXECUTABLE_NAME} LANGUAGES CXX)
 
+find_package(CUDA REQUIRED)
 
-# Tell CMake to run moc when necessary
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
+include_directories("." include "/usr/local/cuda/include")
+
+set(CUDA_HOST_COMPILATION_CPP ON)
+set(CUDA_NVCC_FLAGS -std=c++11 -O3 -Wno-deprecated-gpu-targets --gpu-architecture=sm_52 --disable-warnings)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-	
-include_directories(include "D:/CUDA Samples/v10.0/common/inc")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_FLAGS}")
+set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_FLAGS}")  
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --gpu-architecture=sm_52")
+set(CUDA_SEPARABLE_COMPILATION ON)
 
-set(HEADERS Exercise.hpp include/ChronoGPU.hpp)
-set(SOURCES main.cpp Exercise.cu include/ChronoGPU.cu)
-
-#Remember dependencies!  
-add_executable(${EXECUTABLE_NAME} ${SOURCES} ${HEADERS})
-target_link_libraries(${EXECUTABLE_NAME})
-
-# Enable C++14 standard compliance
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_STANDARD 14)
+set(HEADERS Exercise.hpp include/chronoGPU.hpp)
+set(SOURCES main.cpp Exercise.cu include/chronoGPU.cu)
+cuda_add_executable(${EXECUTABLE_NAME} ${SOURCES} ${HEADERS})

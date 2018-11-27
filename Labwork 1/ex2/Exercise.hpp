@@ -74,8 +74,12 @@ public:
       }
     }
   }
-
-  void checkQuestion3() const;
+  
+  void checkQuestion3() const {
+    const size_t size = sizeof(MyDataType)*m_size;
+    std::cout<<"Check exercice 3 with arrays of size "<<(size>>20)<<" Mb"<<std::endl;
+    checkQuestion3withDataType(MyDataType(0));
+  }
 
   template<typename T>
   void checkQuestion3withDataType(const T&) const {

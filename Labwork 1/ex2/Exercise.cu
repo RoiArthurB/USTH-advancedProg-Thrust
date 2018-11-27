@@ -110,13 +110,8 @@ void Exercise::Question2(const thrust::host_vector<int>&A, thrust::host_vector<i
 	std::cout <<" - DOWN time 	:" << chrDOWN.elapsedTime() << "ms" << std::endl;
 }
 
-
-
-
 template <typename T>
-void Exercise::Question3(const thrust::host_vector<T>& A,
-						thrust::host_vector<T>&OE) const 
-{
+void Exercise::Question3(const thrust::host_vector<T>& A, thrust::host_vector<T>&OE) const {
   // TODO: idem for big objects
 }
 
@@ -130,10 +125,3 @@ struct MyDataType {
 
 	// TODO: add what you want ...
 };
-
-// Warning: do not modify the following function ...
-void Exercise::checkQuestion3() const {
-	const size_t size = sizeof(MyDataType)*m_size;
-	std::cout<<"Check exercice 3 with arrays of size "<<(size>>20)<<" Mb"<<std::endl;
-	checkQuestion3withDataType(MyDataType(0));
-}
