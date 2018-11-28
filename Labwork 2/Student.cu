@@ -87,13 +87,48 @@ void D_Matrix::diffusion(const int line, D_Matrix& result) const
 //////////////////////////////////////////////////////////////////////////////////
 // Exercice 4
 bool D_Matrix::Exo4IsDone() {
-	return false;
+	return true;
 }
 // returns this times that ...
 D_Matrix D_Matrix::product1(const D_Matrix& that) const
 {	
-	D_Matrix result(m_n);
-	return result;
+	const int size = m_n * m_n;
+
+	// 3. Transpose
+	D_Matrix d_TB = that.transpose();
+
+	// 4. Allocate C matrix
+	D_Matrix d_C(m_n);
+
+	// 5. For each row in C
+	for(int line = 0; line < m_n; line++){
+			// 6.1 Diffusion
+			D_Matrix d_TBi(m_n);	
+			d_TB.diffusion(line, d_TBi);
+		
+			// 6.2 Map
+			D_Matrix d_D(m_n);
+			thrust::transform(d_val, d_val + size, d_TBi.d_val, d_D.d_val, thrust::multiplies<int>());
+
+			// 8.
+			auto fkeys = (thrust::placeholders::_1 / m_n) * m_n + line;
+			thrust::device_vector<int> column(m_n);
+			thrust::device_vector<int> keys(m_n);
+
+			thrust::reduce_by_key(
+				thrust::make_transform_iterator(thrust::make_counting_iterator(0), fkeys),
+				thrust::make_transform_iterator(thrust::make_counting_iterator(size), fkeys),
+				d_D.d_val,
+				keys.begin(),
+				column.begin()
+			);
+
+			// 9.
+			thrust::scatter(column.begin(), column.end(), keys.begin(), d_C.d_val);
+	}
+
+	// 11. / 12.
+	return d_C;
 }
 
 
