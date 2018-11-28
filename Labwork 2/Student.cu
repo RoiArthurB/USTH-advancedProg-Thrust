@@ -33,21 +33,31 @@ D_Matrix D_Matrix::operator+(const D_Matrix& that) const
 	return result;
 }
 
-
-
 //////////////////////////////////////////////////////////////////////////////////
 // Exercice 2
 bool D_Matrix::Exo2IsDone() {
-	return false;
+	return true;
 }
 // define the Matrix::transpose function
 D_Matrix D_Matrix::transpose() const
 {
 	D_Matrix result(m_n);
+
+	// col = idx % m_n
+	// row = idx / m_n
+
+	thrust::scatter(
+		d_val, d_val + (m_n * m_n),
+		thrust::make_transform_iterator(
+			thrust::make_counting_iterator(0),
+			//swap row and col 
+			(thrust::placeholders::_1 % m_n) * m_n + (thrust::placeholders::_1 / m_n) 
+		),
+		result.d_val
+	);
+
 	return result;
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////////
 // Exercice 3
