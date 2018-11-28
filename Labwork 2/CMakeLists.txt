@@ -19,6 +19,6 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CUDA_SEPARABLE_COMPILATION ON)
 
-set(HEADERS Exercise.hpp include/chronoGPU.hpp)
-set(SOURCES main.cpp Exercise.cu include/chronoGPU.cu)
+set(HEADERS H_Matrix.cuh D_Matrix.cuh utils/chronoGPU.hpp utils/chronoCPU.hpp utils/common.hpp )
+set(SOURCES main.cu H_Matrix.cu D_Matrix.cu Student.cu utils/chronoCPU.cpp utils/chronoGPU.cu )
 cuda_add_executable(${EXECUTABLE_NAME} ${SOURCES} ${HEADERS})

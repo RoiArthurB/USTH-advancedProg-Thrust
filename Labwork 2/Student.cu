@@ -13,15 +13,24 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Exercice 1
 bool D_Matrix::Exo1IsDone() {
-	return false;
+	return true;
 }
 
 // returns this times that ...
 D_Matrix D_Matrix::operator+(const D_Matrix& that) const
 {
-  // do "d_val + that.d_val" 
-  D_Matrix result(m_n);
-  return result;
+	// do "d_val + that.d_val" 
+	/*	GOOD TO KNOW :
+		m_n		// size of row / col
+		d_val	// pointer to data / iterator
+			-> d_val + m_n * m_n	// end pointer
+	*/
+	D_Matrix result(m_n);
+	
+	const int size = m_n * m_n;
+	thrust::transform(d_val, d_val + size, that.d_val, result.d_val, thrust::plus<int>());
+
+	return result;
 }
 
 
