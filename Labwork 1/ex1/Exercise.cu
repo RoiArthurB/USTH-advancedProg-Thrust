@@ -42,12 +42,32 @@ void Exercise::Question1(const thrust::host_vector<int>& A, const thrust::host_v
 }
 
 
-void Exercise::Question2(thrust::host_vector<int>&A) const 
-{
-  // TODO: addition using ad hoc iterators
+void Exercise::Question2(thrust::host_vector<int>&A) const  {
+	// TODO: addition using ad hoc iterators
+	ChronoGPU chrUP, chrDOWN, chrGPU;
+	for (int i=3; i--; ){
+		chrUP.start();
+		thrust::counting_iterator<int>X(1);
+		thrust::constant_iterator<int>Y(4);
+		thrust::device_vector<int> gpuA(A.size());
+		chrUP.stop();
+		chrGPU.start();
+		thrust::transform(
+			X, X + A.size(),
+		 	Y, gpuA.begin(),
+		 	thrust::placeholders::_1+ thrust::placeholders::_2
+		);
+		chrGPU.stop();
+		chrDOWN.start();
+		A = gpuA;
+		chrDOWN.stop();
+	}
+	float elapsed = chrUP.elapsedTime() + chrDOWN.elapsedTime() + chrGPU.elapsedTime();
+	std::cout << "Question2 done in " 	<< elapsed 					<< std::endl;
+	std::cout << "	- UP time : " 		<< chrUP.elapsedTime() 		<< std::endl;
+	std::cout << "	- GPU time : "		<< chrGPU.elapsedTime() 	<< std::endl;
+	std::cout << "	- DOWN time : " 	<< chrDOWN.elapsedTime() 	<< std::endl;
 }
-
-
 
 
 

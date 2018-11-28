@@ -66,6 +66,13 @@ public:
       }
     }
   }
+  // function that adds two elements and return a new one
+  class AdditionFunctor : public thrust::binary_function<float, float, float> {
+    public :
+      __host__ __device__ float operator()( const float &x, const float &y ) {
+        return x + y ;
+      }
+  };
 
   void checkQuestion3() const {
     thrust::host_vector<int> A(m_size);
