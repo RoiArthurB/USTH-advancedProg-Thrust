@@ -100,10 +100,10 @@ bool test_diffusion(const H_Matrix& hA, const D_Matrix& dA)
 		gChr.stop();
 		gElapsed += gChr.elapsedTime();
 		cChr.start();
-		diffused.data(result.h_val);
+		hA.diffusion(nb, thrust);
 		cChr.stop();
 		cElapsed += cChr.elapsedTime();
-		hA.diffusion(nb, thrust);
+		diffused.data(result.h_val);
 		if (result != thrust)
 			break;
 	}	

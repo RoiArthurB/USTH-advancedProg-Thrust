@@ -62,13 +62,27 @@ D_Matrix D_Matrix::transpose() const
 //////////////////////////////////////////////////////////////////////////////////
 // Exercice 3
 bool D_Matrix::Exo3IsDone() {
-	return false;
+	return true;
 }
+struct DiffusionFunctor : public thrust::unary_function<int, int> {
+	const thrust::device_ptr<int> d_val;
+	const int m_n;
+	DiffusionFunctor(const thrust::device_ptr<int> val, const int n) : d_val(val), m_n(n) {}
+	__device__ int operator()(const int i){
+		return d_val[i % m_n];
+	}
+};
 void D_Matrix::diffusion(const int line, D_Matrix& result) const 
 {
+	//thrust::copy_n(d_val + m_n * line , m_n, result.d_val);
+	thrust::copy_n(
+		thrust::make_transform_iterator(
+			thrust::make_counting_iterator(0),
+			DiffusionFunctor(d_val + m_n * line, m_n)),
+		m_n*m_n,
+		result.d_val
+	);
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////////
 // Exercice 4
