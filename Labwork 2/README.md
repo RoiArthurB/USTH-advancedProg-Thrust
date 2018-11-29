@@ -23,18 +23,18 @@ The parallel pattern to use is a simple [*copy*](https://thrust.github.io/doc/gr
 Your first implementation of the matrix product will use the following algorithm:
 
 ```
-<span style="color:blue">Function</span> Product( A, B : D_Matrix ) : D_Matrix ;
-<span style="color:blue">Begin</span>
-	D_Matrix TB := Transpose( B ) ; <span style="color:red">{ Exercise 1 }</span>
-	D_Matrix C( A.m_n ); <span style="color:red">{ result is a n-times-n matrix }</span>
-	<span style="color:blue">For</span> i=0 TO C.m_n - 1 Do <span style="color:red">{ For each column of C }</span>
-		D_Matrix D = Map(A,Diffusion(TB[i]),’*’); <span style="color:red">{ Product of each line of A by the ith column of B }</span>
-		<span style="color:red">{ Reduction of each line of D, saved into vector ‘‘Column’’ }</span>
+Function Product( A, B : D_Matrix ) : D_Matrix ;
+Begin
+	D_Matrix TB := Transpose( B ) ; { Exercise 1 }
+	D_Matrix C( A.m_n ); { result is a n-times-n matrix }
+	For i=0 TO C.m_n - 1 Do { For each column of C }
+		D_Matrix D = Map(A,Diffusion(TB[i]),’*’); { Product of each line of A by the ith column of B }
+		{ Reduction of each line of D, saved into vector ‘‘Column’’ }
 		SegmentedReduce( LineNumber, D, Column, ’+’ ) ;
-		Scatter( Column, ColumnElements(C, i) ) ; <span style="color:red">{ Set the vector ‘‘Column’’ as the ith column of C }</span>
-	<span style="color:blue">End Do</span>;
+		Scatter( Column, ColumnElements(C, i) ) ; { Set the vector ‘‘Column’’ as the ith column of C }
+	End Do;
 Product := C;
-<span style="color:blue">End</span> Produit
+End Produit
 ```
 
 At line 3, the transpose of B is made using exercise 1. At line 4, we just allocate the result matrix denoted C. Then, lines 5 and following, the C columns are calculated one-by-one: at first, line 6, we calculated matrix D as the “pseudo” product of A by a matrix containing the i th column of B repeated n times (thanks to exercise 3) ; this product leads to a matrix for which each cell of index (i,j) is the product of two cells having same index both in A and Diffusion(TB[i]). Then, line 8 fills two vectors of size n, the first with the line number of D, the second with the reduction (using an addition as binary operator) made on each line (see [*Reduce By Key*](http://thrust.github.io/doc/group__reductions.html#ga1fd25c0e5e4cc0a6ab0dcb1f7f13a2ad)). The second resulting array contains the i th column of C, that is scattered line 9. After the loop, it suffices to return the matrix C as the result (line 11).
