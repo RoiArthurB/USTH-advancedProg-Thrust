@@ -82,7 +82,20 @@ uchar4 HSV2RGB( const float H, const float S, const float V )
 __global__
 void rgb2hsv(	const uchar4 *const inRGB, const int width, const int height,
 				float *const outH, float *const outS, float *const outV ) {
-	/// TODO
+	// Calculate tid
+    unsigned int tidx = threadIdx.x + blockIdx.x * blockDim.x;
+    unsigned int tidy = threadIdx.y + blockIdx.y * blockDim.y;
+    if (tidx >= width || tidy >= height) return;
+    
+	int tid = tidx + (tidy * width);
+
+	// Process
+	float3 hsv = RGB2HSV( inRGB[tid] );
+
+	// Output
+	outH[tid] = hsv.x;
+	outS[tid] = hsv.y;
+	outV[tid] = hsv.z;
 }
 
 // Conversion from HSV (inH, inS, inV) to RGB (outRGB)
@@ -90,7 +103,18 @@ void rgb2hsv(	const uchar4 *const inRGB, const int width, const int height,
 __global__
 void hsv2rgb(	const float *const inH, const float *const inS, const float *const inV, 
 				const int width, const int height, uchar4 *const outRGB ) {	
-	/// TODO
+	// Calculate tid
+    unsigned int tidx = threadIdx.x + blockIdx.x * blockDim.x;
+    unsigned int tidy = threadIdx.y + blockIdx.y * blockDim.y;
+    if (tidx >= width || tidy >= height) return;
+    
+	int tid = tidx + (tidy * width);
+
+	// Process
+	uchar4 rgb = HSV2RGB( outH[tid], outS[tid], outV[tid] );
+
+	// Output
+	inRGB[tid] = rgb;
 }
 
 // ============================================ Exercise 2
