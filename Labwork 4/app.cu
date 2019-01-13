@@ -114,7 +114,7 @@ void App::initGL() {
 
 	std::cout << "Initializing glew..." << std::endl;
 
-	if ( glewInit() != GLEW_OK ) {
+/*	if ( glewInit() != GLEW_OK ) {
 		std::cerr << "Error: " << glewGetErrorString( glewInit() );
 		app->cleanAndExit();
 	}
@@ -127,7 +127,7 @@ void App::initGL() {
 			<< "  - GL_ARB_vertex_buffer_object"	<< std::endl
 			<< "  - GL_ARB_pixel_buffer_object"		<< std::endl << std::endl;
         app->cleanAndExit();
-    }
+    }*/
 
 	glGenBuffers( 1, &app->m_pboGL);
     glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, app->m_pboGL);

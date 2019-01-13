@@ -63,7 +63,7 @@ thrust::host_vector<ColoredObject> compactBlue( const thrust::host_vector<Colore
 
 	chr.stop();
 
-	std::cout << "Question 1 done in " << chr.elapsedTime() << " ms" << std::endl;
+	std::cout << "Exercise 1 done in " << chr.elapsedTime() << " ms" << std::endl;
 
 	return answer;
 }
@@ -87,24 +87,61 @@ void display(const thrust::host_vector<unsigned>& v, const std::string& msg = "a
 thrust::host_vector<int> radixSort( const thrust::host_vector<int>& h_input ) {
 	const unsigned size = unsigned(h_input.size());
 	//
-	thrust::device_vector<unsigned> d_output(size);
-	thrust::device_vector<unsigned> d_io[2] = {h_input, d_output};
+	//thrust::device_vector<unsigned> d_output(size);
+	thrust::device_vector<unsigned> d_io[2] = {h_input, thrust::device_vector<unsigned>(size) }; //d_output};
 	thrust::device_vector<unsigned> d_flags(size);
 	thrust::device_vector<unsigned> d_bits0(size);
-	thrust::device_vector<unsigned> d_bits1(size)
+	thrust::device_vector<unsigned> d_bits1(size);
 
 	ChronoGPU chr;
-
 	chr.start();
+
 	for(int i = 0; i<32; i++){
-		//Get the bits, scan in one sense then the other, gather
+		//Get the bits, scan in one sense then the other, scatter!
 		const int ioIn = i & 0x1;
 		const int ioOut = i - ioIn;
-		//std::count <<
+
+		thrust::transform(
+			d_io[ioIn].begin(),
+			d_io[ioIn].end(),
+			d_flags.begin(),
+			(thrust::placeholders::_1 >> i) & 0x1
+		);
+		thrust::exclusive_scan(
+			thrust::make_transform_iterator(
+				d_flags.begin(),
+				1 - thrust::placeholders::_1 //needs to inverts the flag
+			),
+			thrust::make_transform_iterator(
+				d_flags.end(),
+				1 - thrust::placeholders::_1 //needs to inverts the flag
+			),
+			d_bits0.begin()
+		);
+		// scan for bits 1: we will use SIZE-#, so the last one will be at pos size-1, previous at siz... 
+		thrust::inclusive_scan(
+			d_flags.rbegin(),
+			d_flags.rend(),
+			d_bits1.rbegin()
+		);
+		thrust::scatter(
+			d_io[ioIn].begin(),
+			d_io[ioIn].end(),
+			thrust::make_transform_iterator(
+				thrust::make_zip_iterator(
+					thrust::make_tuple(d_flags.begin(), d_bits0.begin(), d_bits1.begin())
+				),
+				WhereToGoFunctor(size)
+			),
+			d_io[ioOut].begin()
+		);
 	}
 
+	chr.stop();
+
+	std::cout << "Exercise 2 done in " << chr.elapsedTime() << " ms" << std::endl;
 	thrust::host_vector<int> answer;
-	return answer;
+	return answer;//d_io;//answer;
 }
 
 // ==========================================================================================

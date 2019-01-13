@@ -122,7 +122,8 @@ void hsv2rgb(	const float *const inH, const float *const inS, const float *const
 // Launched in 1D with dimBlock = SIZE_HISTO
 __global__
 void histo( const float *const inV, const int sizeV, unsigned int *const outHisto ) {
-	/// TODO 
+	// Calculate tid
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
 }
 
 // ============================================ Exercise 3

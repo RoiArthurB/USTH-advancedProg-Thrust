@@ -13,7 +13,7 @@
 #define SIZE_HISTO 256
 
 // ============================================ Exercice 1
-#define CONVERSIONS_NOT_IMPLEMENTED
+//#define CONVERSIONS_NOT_IMPLEMENTED
 // Conversion from RGB (inRGB) to HSV (outH, outS, outV)
 // Launch with 2D grid
 __global__
