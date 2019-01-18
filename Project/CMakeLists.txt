@@ -14,7 +14,8 @@ if (NOT CUDA_FOUND)
     message("CUDA location not found")
 endif()
 
-set(CUDA_VERBOSE_BUILD ON)
+#set(CUDA_VERBOSE_BUILD ON)
+set(CUDA_VERBOSE_BUILD OFF)
 
 if (WIN32)
     include_directories(utils students "D:/CUDA Samples/v10.0/common/inc")

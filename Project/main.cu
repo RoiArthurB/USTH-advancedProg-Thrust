@@ -71,7 +71,6 @@ void exercise4( const PPMBitmap& input, PPMBitmap& output, const int t, const ch
 	std::cout << std::endl;
 	std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<std::endl;
 	std::cout << "Exercise 4 ... " << std::endl;
-	std::cout << "Exercise 3 ... " << std::endl;
 	// call student part
 	float elapsedTime = student4(input, output, t);
 	std::cout << "your implementation runs in " << elapsedTime << " ms."<<std::endl;
