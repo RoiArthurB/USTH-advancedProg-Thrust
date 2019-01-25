@@ -16,7 +16,7 @@
  
 // converts a RGB color to a HSV one ...
 __device__
-float3 RGB2HSV( const uchar3 inRGB ) {
+float3 RGB2HSVbis( const uchar3 inRGB ) {
 	const float R = (float)( inRGB.x ) / 256.f;
 	const float G = (float)( inRGB.y ) / 256.f;
 	const float B = (float)( inRGB.z ) / 256.f;
@@ -50,7 +50,7 @@ float3 RGB2HSV( const uchar3 inRGB ) {
 
 // converts a HSV color to a RGB one ...
 __device__
-uchar3 HSV2RGB( const float H, const float S, const float V )
+uchar3 HSV2RGBbis( const float H, const float S, const float V )
 {
 	const float	d	= H / 60.f;
 	const int	hi	= (int)d % 6;
@@ -103,7 +103,7 @@ void sortV(float *a, const int N){
 // Conversion from RGB (inRGB) to HSV (outHSV)
 // Launched with 2D grid
 __global__ 
-void rgb2hsv( uchar3 *inRGB, float3 *outHSV, const int width, const int height ) {
+void rgb2hsvBis( uchar3 *inRGB, float3 *outHSV, const int width, const int height ) {
 	// Calculate tid
     unsigned int tidx = threadIdx.x + blockIdx.x * blockDim.x;
     unsigned int tidy = threadIdx.y + blockIdx.y * blockDim.y;
@@ -115,7 +115,7 @@ void rgb2hsv( uchar3 *inRGB, float3 *outHSV, const int width, const int height )
 		printf("\tDbt de kernel ====== rgb2hsv ======\n");
 	
 	// Process
-	float3 hsv = RGB2HSV( inRGB[tid] );
+	float3 hsv = RGB2HSVbis( inRGB[tid] );
 
 	// Output
 	outHSV[tid] = hsv;
@@ -124,7 +124,7 @@ void rgb2hsv( uchar3 *inRGB, float3 *outHSV, const int width, const int height )
 // Conversion from HSV (inH, inS, inV) to RGB (outRGB)
 // Launched with 2D grid
 __global__
-void hsv2rgb( float3 *inHSV, uchar3 *outRGB, const int width, const int height ) {
+void hsv2rgbBis( float3 *inHSV, uchar3 *outRGB, const int width, const int height ) {
 	// Calculate tid
     unsigned int tidx = threadIdx.x + blockIdx.x * blockDim.x;
     unsigned int tidy = threadIdx.y + blockIdx.y * blockDim.y;
@@ -136,7 +136,7 @@ void hsv2rgb( float3 *inHSV, uchar3 *outRGB, const int width, const int height )
 		printf("\tDbt de kernel ====== hsv2rgb ======\n");
 
 	// Process
-	uchar3 rgb = HSV2RGB( inHSV[tid].x, inHSV[tid].y, inHSV[tid].z );
+	uchar3 rgb = HSV2RGBbis( inHSV[tid].x, inHSV[tid].y, inHSV[tid].z );
 
 	// Output
 	outRGB[tid] = rgb;
@@ -275,7 +275,7 @@ float student2(const PPMBitmap &in, PPMBitmap &out, const int size) {
     					 (height + (blockSize.y-1))/blockSize.y, 1 );
         
     // Convertion from RGB to HSV
-	rgb2hsv<<<gridSize, blockSize>>>(devInput, devHSV, width, height);
+	rgb2hsvBis<<<gridSize, blockSize>>>(devInput, devHSV, width, height);
 	cudaDeviceSynchronize();
 
 	cudaError_t e = cudaGetLastError();
@@ -291,7 +291,7 @@ float student2(const PPMBitmap &in, PPMBitmap &out, const int size) {
 		printf("CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(e));
 
 	// Convertion from HSV to RGB
-	hsv2rgb<<<gridSize, blockSize>>>(devHSVfiltre, devOutput, width, height);
+	hsv2rgbBis<<<gridSize, blockSize>>>(devHSVfiltre, devOutput, width, height);
 	cudaDeviceSynchronize();
 
 	e = cudaGetLastError();
